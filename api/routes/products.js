@@ -1,3 +1,5 @@
+/* eslint no-underscore-dangle: 0 */
+
 const express = require('express');
 
 const router = express.Router();
@@ -12,17 +14,17 @@ router.get('/', async (req, res, next) => {
   //   console.log(err);
   //   res.status(500).json({ error: err });
   // };
-  const docs = await Product.find().select('-__v').catch(next);
+  const docs = await Product.find().catch(next);
   // console.log(docs);
   const response = {
     count: docs.length,
     products: docs.map(doc => ({
       name: doc.name,
       price: doc.price,
-      _id: doc._id, /* eslint no-underscore-dangle: 0 */
+      _id: doc._id,
       request: {
         type: 'GET',
-        url: `localhost:3000/products/${doc._id}`,
+        url: `http://localhost:3000/products/${doc._id}`,
       },
     })),
   };
@@ -49,7 +51,7 @@ router.post('/', async (req, res, next) => {
       price: result.price,
       _id: result._id,
       request: {
-        type: 'POST',
+        type: 'GET',
         url: `http://localhost:3000/products/${result._id}`,
       },
     },
@@ -76,10 +78,16 @@ router.get('/:productId', async (req, res, next) => {
   //   console.log(err);
   //   res.status(500).json({ error: err });
   // };
-  const doc = await Product.findById(req.params.productId).catch(next);
+  const doc = await Product.findById(req.params.productId).select('-__v').catch(next);
   // console.log('From database', doc);
   if (doc) {
-    res.status(200).json(doc);
+    res.status(200).json({
+      product: doc,
+      request: {
+        type: 'GET',
+        url: 'http://localhost:3000/products',
+      },
+    });
   } else {
     res.status(404).json({ message: 'No valid entry found for provided ID' });
   }
@@ -105,7 +113,13 @@ router.patch('/:productId', async (req, res, next) => {
     .findByIdAndUpdate(req.params.productId, req.body, { new: true })
     .catch(next);
   // console.log(result);
-  res.status(200).json(result);
+  res.status(200).json({
+    message: 'Product updated',
+    request: {
+      type: 'GET',
+      url: `http://localhost:3000/products/${result._id}`,
+    },
+  });
 });
 
 router.delete('/:productId', async (req, res, next) => {
@@ -117,7 +131,15 @@ router.delete('/:productId', async (req, res, next) => {
   //   });
   // };
   const result = await Product.findByIdAndRemove(req.params.productId).catch(next);
-  res.status(200).json(result);
+  res.status(200).json({
+    message: 'Product deleted',
+    request: {
+      result,
+      type: 'POST',
+      url: 'http://localhost:3000/products',
+      body: { name: 'String', price: 'Number' },
+    },
+  });
 });
 
 module.exports = router;
