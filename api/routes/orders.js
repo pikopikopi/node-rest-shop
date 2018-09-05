@@ -29,13 +29,18 @@ router.get('/', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
   const product = await Product.findById(req.body.productId).catch(next);
+  if (!product) {
+    return res.status(404).json({
+      message: 'Product not found',
+    });
+  }
   const order = new Order({
     _id: mongoose.Types.ObjectId(),
-    quantity: req.body.quantity,
     product: req.body.productId,
+    quantity: req.body.quantity,
   });
   const result = await order.save().catch(next);
-  res.status(201).json({
+  return res.status(201).json({
     message: 'Order stored',
     createdOrder: {
       _id: result._id,
