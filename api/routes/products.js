@@ -6,6 +6,10 @@ const router = express.Router();
 
 const mongoose = require('mongoose');
 
+const multer = require('multer');
+
+const upload = multer({ dest: '/uploads/' });
+
 const Product = require('../models/product');
 
 // Handle incoming GET requests to /orders
@@ -37,7 +41,8 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-router.post('/', async (req, res, next) => {
+router.post('/', upload.single('productImage'), async (req, res, next) => {
+  console.log(req.file);
   const product = new Product({
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name,
