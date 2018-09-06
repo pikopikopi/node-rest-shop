@@ -1,0 +1,32 @@
+{ quantity: 22,
+    _id: 5b8dcccb4fa1fe26d4e54082,
+    product:
+     { _id: 5b8b465257a7ca62df6bd1f8,
+       name: 'Something awsome',
+       price: 333,
+       __v: 0 },
+    __v: 0 },
+        {
+            "_id": "5b8dcccb4fa1fe26d4e54082",
+            "product": {
+                "_id": "5b8b465257a7ca62df6bd1f8",
+                "name": "Something awsome",
+                "price": 333,
+                "__v": 0
+            },
+            "quantity": 22,
+            "request": {
+                "type": "GET",
+                "url": "http://localhost:3000/orders/5b8dcccb4fa1fe26d4e54082"
+            }
+        },
+
+        {
+            "_id": "5b8dcccb4fa1fe26d4e54082",
+            "product": "5b8b465257a7ca62df6bd1f8",
+            "quantity": 22,
+            "request": {
+                "type": "GET",
+                "url": "http://localhost:3000/orders/5b8dcccb4fa1fe26d4e54082"
+            }
+        },

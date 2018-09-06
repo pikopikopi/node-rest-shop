@@ -11,7 +11,8 @@ const Product = require('../models/product');
 const router = express.Router();
 
 router.get('/', async (req, res, next) => {
-  const docs = await Order.find().catch(next);
+  const docs = await Order.find().populate('product', 'name').catch(next);
+  console.log(docs);
   res.status(200).json({
     count: docs.length,
     orders: docs.map(doc => (
@@ -54,17 +55,31 @@ router.post('/', async (req, res, next) => {
   });
 });
 
-router.get('/:orderId', (req, res, next) => {
-  res.status(200).json({
-    message: 'Order details',
-    orderId: req.params.orderId,
+router.get('/:orderId', async (req, res, next) => {
+  const order = await Order.findById(req.params.orderId).populate('product').catch(next);
+  if (!order) {
+    return res.status(404).json({
+      message: 'Order not found',
+    });
+  }
+  return res.status(200).json({
+    order,
+    request: {
+      type: 'GET',
+      url: 'http://localhost:3000/orders',
+    },
   });
 });
 
-router.delete('/:orderId', (req, res, next) => {
+router.delete('/:orderId', async (req, res, next) => {
+  const result = await Order.remove({ _id: req.params.orderId }).catch(next);
   res.status(200).json({
     message: 'Order deleted',
-    orderId: req.params.orderId,
+    request: {
+      type: 'POST',
+      url: 'http://localhost:3000/orders',
+      body: { productId: 'ID', quantity: 'Number' },
+    },
   });
 });
 
