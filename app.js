@@ -12,6 +12,7 @@ const orderRoutes = require('./api/routes/orders');
 mongoose.connect('mongodb://54.169.190.46:27017/node-shop', { useNewUrlParser: true });
 
 app.use(morgan('dev'));
+app.use('/uploads', express.static('uploads'));
 // app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 

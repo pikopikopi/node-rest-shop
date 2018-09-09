@@ -8,7 +8,32 @@ const mongoose = require('mongoose');
 
 const multer = require('multer');
 
-const upload = multer({ dest: '/uploads/' });
+const storage = multer.diskStorage({
+  destination(req, file, cb) {
+    cb(null, './uploads/');
+  },
+  filename(req, file, cb) {
+    cb(null, new Date().toISOString() + file.originalname);
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  // reject a file
+  if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
+const upload = multer({
+  storage,
+  limits:
+  {
+    fileSize: 1024 * 1024 * 5,
+  },
+  fileFilter,
+});
 
 const Product = require('../models/product');
 
@@ -25,6 +50,7 @@ router.get('/', async (req, res, next) => {
     products: docs.map(doc => ({
       name: doc.name,
       price: doc.price,
+      productImage: doc.productImage,
       _id: doc._id,
       request: {
         type: 'GET',
@@ -47,6 +73,7 @@ router.post('/', upload.single('productImage'), async (req, res, next) => {
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name,
     price: req.body.price,
+    productImage: req.file.path,
   });
   const result = await product.save().catch(next);
   res.status(201).json({
