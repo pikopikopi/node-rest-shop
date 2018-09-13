@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.get('/', async (req, res, next) => {
   const docs = await Order.find().populate('product', 'name').catch(next);
-  console.log(docs);
+  // console.log(docs);
   res.status(200).json({
     count: docs.length,
     orders: docs.map(doc => (
@@ -72,10 +72,11 @@ router.get('/:orderId', async (req, res, next) => {
 });
 
 router.delete('/:orderId', async (req, res, next) => {
-  const result = await Order.remove({ _id: req.params.orderId }).catch(next);
+  const result = await Order.deleteOne({ _id: req.params.orderId }).catch(next);
   res.status(200).json({
     message: 'Order deleted',
     request: {
+      result,
       type: 'POST',
       url: 'http://localhost:3000/orders',
       body: { productId: 'ID', quantity: 'Number' },
