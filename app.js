@@ -2,7 +2,10 @@ const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 
+const CONFIG = require('./CONFIG/CONFIG');
+
 mongoose.set('useCreateIndex', true);
+mongoose.set('useFindAndModify', false);
 // const bodyParser = require('body-parser');
 
 const app = express();
@@ -12,7 +15,7 @@ const productRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
 const userRoutes = require('./api/routes/user');
 
-mongoose.connect('mongodb://54.169.190.46:27017/node-shop', { useNewUrlParser: true });
+mongoose.connect(CONFIG.DB.URL, { useNewUrlParser: true });
 
 app.use(morgan('dev'));
 app.use('/uploads', express.static('uploads'));
@@ -32,13 +35,7 @@ app.use((req, res, next) => {
   return next();
 });
 
-// app.use((req, res, next) => {
-//   res.status(200).json({
-//     message: 'It works!',
-//   });
-// });
 
-// Routes which should handle requests
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
 app.use('/user', userRoutes);
